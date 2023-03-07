@@ -1,0 +1,133 @@
+{:tasks
+ {:requires ([babashka.fs :as fs]
+             [babashka.tasks :as tasks]
+             [clojure.string :as str])
+  :enter (when (not (str/starts-with? (:name (current-task)) "-"))
+           (println (format "-[viip %s]----" (:name (current-task)))))
+  :init (do
+          (def windows? (str/starts-with? (System/getProperty "os.name") "Windows"))
+          (defn clojure
+            "Clojure defaulting to stderr output"
+            [arg & args]
+            (apply tasks/clojure (str "-J-Dclojure.main.report=stderr " arg) args)))
+
+  -artifact "target/viip.jar"
+  -native-image-path "target"
+
+  clean
+  {:task (do
+           (doseq [dir ["target" ".cpcache"]]
+             (fs/delete-tree dir)))}
+
+  build {:doc "Build classes and uberjar"
+         :depends [-artifact]
+         :task
+         (if (seq (fs/modified-since -artifact ["src" "bb.edn" "deps.edn" "build.clj"]))
+           (do
+             (println "Building" -artifact)
+             (clojure "-T:build uber"))
+           (println -artifact "already built"))}
+
+  graalvm {:doc "Checks GRAALVM_HOME env var"
+           :task
+           (let [env (System/getenv "GRAALVM_HOME")]
+             (assert env "Set GRAALVM_HOME")
+             env)}
+
+  -graalvm-native-image
+  {:doc "Installs/resolves graalvm native-image binary"
+   :depends [graalvm]
+   :task (do (shell (str (fs/file graalvm
+                                  "bin"
+                                  (if windows?
+                                    "gu.cmd"
+                                    "gu")))
+                    "install" "native-image")
+             (str (fs/file graalvm
+                           "bin"
+                           (if windows?
+                             "native-image.cmd"
+                             "native-image"))))}
+
+  ;; native image from uber
+  -native-image-uber-name
+  "viip"
+
+  -native-image-uber-fname
+  {:depends [-native-image-path -native-image-uber-name]
+   :task (str -native-image-path "/" -native-image-uber-name (when windows? ".exe"))}
+
+  native-image-uber
+  {:doc "Builds native image from uber"
+   :depends [build
+             -graalvm-native-image
+             -native-image-uber-fname
+             -native-image-uber-name]
+   :task (if (seq (fs/modified-since -native-image-uber-fname ["target/viip.jar"]))
+           (do
+             (println "Building" -native-image-uber-fname)
+             (shell -graalvm-native-image
+                    ;; note: we are omitting --initialize-at-build-time
+                    "-jar" "target/viip.jar"
+                    "--no-server"
+                    "--no-fallback"
+                    "--allow-incomplete-classpath"
+                    "--enable-url-protocols=http,https"
+                    (str "-H:Path=" -native-image-path)
+                    (str "-H:Name=" -native-image-uber-name)
+                    "-H:IncludeResources=pdfmarks.tmpl" ;; Extra template
+                    "-H:IncludeResources=pdfmarks.tmpl|.*pdfmarks.tmpl.*" ;; Extra template
+                    "-H:ServiceLoaderFeatureExcludeServices=java.net.ContentHandlerFactory"
+                    "-H:ServiceLoaderFeatureExcludeServices=java.nio.charset.spi.CharsetProvider"))
+           (println "Already built" -native-image-uber-fname))}
+
+  native-image-uber-test
+  {:doc "Run native image built from uber"
+   :depends [native-image-uber -native-image-uber-fname]
+   :task (do (println "Running" -native-image-uber-fname)
+             (shell -native-image-uber-fname))}
+
+  ;; native image from classes
+  -native-image-classes-name
+  "viip-classes"
+
+  -native-image-classes-fname
+  {:depends [-native-image-path -native-image-classes-name]
+   :task (str -native-image-path "/" -native-image-classes-name (when windows? ".exe"))}
+
+  native-image-classes
+  {:doc "Builds native image from classes"
+   :depends [build
+             -graalvm-native-image
+             -native-image-classes-fname
+             -native-image-classes-name]
+   :task
+   (do
+     (if (seq (fs/modified-since -native-image-classes-fname "target/classes"))
+       (do
+         (println "Building" -native-image-classes-fname)
+         (shell -graalvm-native-image
+                ;; note: we are omitting --initialize-at-build-time
+                "-cp" (str "target/classes"
+                           (System/getProperty "path.separator")
+                           (-> (with-out-str (clojure "-Spath")) str/trim))
+                "--no-fallback"
+                (str "-H:Path=" -native-image-path)
+                (str "-H:Name=" -native-image-classes-name)
+                "-H:IncludeResources=pdfmarks.tmpl" ;; Extra template
+                "-H:IncludeResources=pdfmarks.tmpl|.*pdfmarks.tmpl.*" ;; Extra template
+                (str "-H:Log=registerResource:3")
+                "net.b12n.viip.core")))
+     (println "Already built" -native-image-classes-fname))}
+
+  native-image-classes-test
+  {:doc "Run native image built from classes"
+   :depends [native-image-classes -native-image-classes-fname]
+   :task (do (println "Running" -native-image-classes-fname)
+             (shell -native-image-classes-fname))}
+
+  ;; run all native image tests
+  native-image-test
+  {:doc "Run integration tests"
+   :depends [native-image-uber-test native-image-classes-test]
+   :task (println "Done.")}}}

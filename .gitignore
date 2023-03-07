@@ -1,0 +1,20 @@
+/target
+*.zip
+/classes
+/checkouts
+profiles.clj
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+.hgignore
+.hg/
+dist
+resources/
+reports/
+/.lsp/
+/.cpcache/
+## Misc files
+codes.pdf
+.rebel_readline_history

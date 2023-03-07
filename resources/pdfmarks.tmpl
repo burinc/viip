@@ -1,0 +1,4 @@
+[ /Title ({{ title }}) /Author ({{ author }}) /Keyword ({{ tags }}) /DOCINFO pdfmark
+{% for item, page-index in pdf-files %}
+[ /Title ({{ item }}) /Page {% if forloop.first %} 1 {% else %} {{ page-index }} {% endif %} /OUT pdfmark
+{% endfor %}

@@ -1,0 +1,5 @@
+f{:known-macros [clojure.test/deftest]
+ :known-namespaces []
+ :known-tags []
+ :ignored-unused-namespaces []
+ :rules {}}

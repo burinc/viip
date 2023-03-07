@@ -1,0 +1,31 @@
+** Tips & Tricks
+*** List of options from =:help :TOhtml= in Vim
+#+begin_example
+let g:html_diff_one_file  = 1
+let g:html_whole_filler   = 1
+let g:html_no_progress    = 1
+let g:html_number_lines   = 1 " default 1
+let g:html_use_css        = 1 " default 0
+let g:html_ignore_conceal = 0 " default 0
+let g:html_dynamic_folds  = 0 " default 0
+let g:html_ignore_folding = 1
+let g:html_prevent_copy   =  "fn" # f - fold column, n - line number, t - fold text, d - diff filter
+let g:html_use_input_for_pc  = "fallback"
+let g:html_no_invalid        = 0
+let g:html_no_pre            = 0  # text will not wrap at the edge of the browser window
+let g:html_pre_wrap          = 1  #cause the wrap at the edge of the browser
+let g:html_expand_tabs       = 1
+let g:html_use_encoding      = "UTF-8"
+let g:html_encoding_override = {'windows-1252': '8bit-cp1252'}
+let g:html_font              = "monospace"
+let g:html_font = ["DejaVu Sans Mono", "Consolas"]
+let g:html_use_xhtml = 1
+#+end_example
+
+#+begin_src sh
+  vim -E -s -c "let g:html_no_progress=1" \
+      -c "syntax on" \
+      -c "set ft=c" \
+      -c "runtime syntax/2html.vim" \
+      -cwqa myfile.c
+#+end_src
