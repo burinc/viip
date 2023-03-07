@@ -4,7 +4,9 @@ Print the any source code using Vim. Ported of my original Ruby's [source2pdf](h
 
 ![](https://github.com/burinc/viip/raw/main/screenshot.png)
 
-Sample [pdf output](https://github.com/burinc/viip/blob/main/viip-codes.pdf) for this project.
+- Sample [pdf output](https://github.com/burinc/viip/blob/main/viip-codes.pdf) for this project.
+- With [Fira Code - Light Mode ](https://github.com/burinc/viip/blob/main/code-github-fira-code.pdf) - using `github` theme.
+- With [Fira Code - Dark Mode](https://github.com/burinc/viip/blob/main/code-onehalfdark-fira-code.pdf) - using `onehalfdark` theme.
 
 ## Requirement
 
