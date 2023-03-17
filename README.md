@@ -117,8 +117,5 @@ Options:
 ``` sh
 ~/bin/viip -b . -e clj -p seoul256-dark -z letter -t "Vim Printer Demo" -o viip-codes.pdf -x /Users/bchoomnuan/codes/b12n-viip/resources/pdfmarks.tmpl
 ```
+
 Which generate the output in the screenshot above.
-
-### TODO
-
-- Remove the need for specify default `pdfmarks.tmpl` file as argument.
