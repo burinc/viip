@@ -1,6 +1,6 @@
 # VIIP - VIm Interactive Printer
 
-Print the any source code using Vim. Ported of my original Ruby's [source2pdf](https://github.com/agilecreativity/source2pdf) to Clojure.
+Print any source code using Vim. Ported of my original Ruby's [source2pdf](https://github.com/agilecreativity/source2pdf) to Clojure.
 
 ![](https://github.com/burinc/viip/raw/main/screenshot.png)
 
