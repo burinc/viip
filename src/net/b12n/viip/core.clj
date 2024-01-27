@@ -54,6 +54,10 @@
         out
         err))))
 
+;; build this as native-image
+;; Then call it from this python library
+;; https://github.com/aerkalov/ebooklib
+
 (defn ^:private html->pdf
   [& [{:keys [input-file output-file title]}]]
   (let [opts ["--margin-top" "5mm" ;"2cm"
@@ -310,9 +314,22 @@ Options:
                             :color-scheme color-scheme
                             :font-name font-name
                             :line-numbers? line-numbers?})
+            ;; TODO: don't convert it to PDF, for now
+            #_
             (html->pdf {:input-file xhtml-file
                         :output-file xhtml-pdf-file
                         :title base-name})))))))
+
+(comment
+  (source->pdf
+   {:base-dir "~/codes/b12n-xhtml"
+    :exts "clj"
+    :preset "seoul256-dark"
+    #_#_:font-name "Source Code Pro"
+    #_#_:color-scheme  "jellybeans"
+    :line-numbers? false})
+
+  )
 
 (defn cleanup
   [xhtml-files input-files]
