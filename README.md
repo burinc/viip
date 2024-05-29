@@ -16,6 +16,15 @@ Print any source code using Vim. Ported of my original Ruby's [source2pdf](https
 - Working installation of [xpdfreader](https://www.xpdfreader.com) needed for `pdfinfo` command
 - Working installation of [GraalVM](https://www.graalvm.org) need to build native-image - need to set `GRAALVM_HOME`
 
+For OSX:
+
+```sh
+brew install wkhtmltopdf \
+             ghostscript
+
+curl -O https://dl.xpdfreader.com/xpdf-tools-mac-4.05.tar.gz
+```
+
 ## Development/Build
 
 ``` sh
