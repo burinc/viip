@@ -20,7 +20,8 @@ For OSX:
 
 ```sh
 brew install wkhtmltopdf \
-             ghostscript
+             ghostscript \
+             xpdf
 
 curl -O https://dl.xpdfreader.com/xpdf-tools-mac-4.05.tar.gz
 ```
